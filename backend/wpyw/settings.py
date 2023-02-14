@@ -39,6 +39,7 @@ INSTALLED_APPS = [
     'django_extensions', #Great packaged to access abstract models
     'django_filters', #Used with DRF
     'rest_framework', #DRF package
+    'storages',
     'project', # New app
 ]
 
@@ -108,31 +109,56 @@ AUTH_PASSWORD_VALIDATORS = [
 
 LANGUAGE_CODE = 'en-us'
 
-TIME_ZONE = 'UTC'
+TIME_ZONE = 'Asia/Seoul'
 
 USE_I18N = True
 
-USE_TZ = True
+USE_TZ = False 
 
 
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/4.1/howto/static-files/
-
 STATIC_URL = 'static/'
+
+AWS_ACCESS_KEY_ID = os.environ.get("AWS_ACCESS_KEY_ID")
+AWS_SECRET_ACCESS_KEY =  os.environ.get("AWS_SECRET_ACCESS_KEY")
+AWS_REGION = os.environ.get("AWS_REGION")
+
+###S3 Storages
+AWS_STORAGE_BUCKET_NAME = os.environ.get("AWS_STORAGE_BUCKET_NAME")
+AWS_S3_CUSTOM_DOMAIN = '%s.s3.%s.amazonaws.com' % (AWS_STORAGE_BUCKET_NAME,AWS_REGION)
+AWS_S3_OBJECT_PARAMETERS = {
+    'CacheControl': 'max-age=86400',
+}
+#DEFAULT_FILE_STORAGE = 'storages.backends.s3boto3.S3Boto3Storage'
+DEFAULT_FILE_STORAGE = 'config.storages.MediaStorage'
+STATICFILES_STORAGE = 'config.storages.StaticStorage'
+
+# static files setting
+STATICFILES_LOCATION = 'static'
+# media files setting
+MEDIAFILES_LOCATION = 'media'
+
+AWS_S3_HOST = 's3.ap-northeast-2.amazonaws.com'
+AWS_QUERYSTRING_AUTH = False
+
+AWS_S3_CUSTOM_DOMAIN = '{}.s3.amazonaws.com'.format(AWS_STORAGE_BUCKET_NAME)
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/4.1/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 REST_FRAMEWORK = {
+    # 'DATETIME_FORMAT': "%Y-%m-%d %H:%M:%S",
+    'DATETIME_FORMAT': "%Y-%m-%d",
     'EXCEPTION_HANDLER': 'rest_framework_json_api.exceptions.exception_handler',
     'DEFAULT_PARSER_CLASSES': (
         'rest_framework_json_api.parsers.JSONParser',
     ),
-    'DEFAULT_RENDERER_CLASSES': (
-        'rest_framework_json_api.renderers.JSONRenderer',
-        'rest_framework.renderers.BrowsableAPIRenderer'
-    ),
+    # 'DEFAULT_RENDERER_CLASSES': (
+    #     'rest_framework_json_api.renderers.JSONRenderer',
+    #     'rest_framework.renderers.BrowsableAPIRenderer'
+    # ),
     'DEFAULT_METADATA_CLASS': 'rest_framework_json_api.metadata.JSONAPIMetadata',
     'DEFAULT_FILTER_BACKENDS': (
         'rest_framework_json_api.filters.QueryParameterValidationFilter',
@@ -140,7 +166,10 @@ REST_FRAMEWORK = {
         'rest_framework_json_api.django_filters.DjangoFilterBackend',
         'rest_framework.filters.SearchFilter',
     ),
-    'SEARCH_PARAM': 'filter[search]',
+    # 'DEFAULT_PAGINATION_CLASS' : 'rest_framework.pagination.LimitOffsetPagination',
+    'DEFAULT_PAGINATION_CLASS' : 'rest_framework.pagination.PageNumberPagination',
+    'PAGE_SIZE' : 20,
+    # 'SEARCH_PARAM': 'filter[search]',
     'TEST_REQUEST_RENDERER_CLASSES': (
         'rest_framework_json_api.renderers.JSONRenderer',
     ),
