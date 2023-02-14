@@ -8,7 +8,7 @@ from .models import Project
 from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework.filters import OrderingFilter, SearchFilter
 # from rest_framework.pagination import PageNumberPagination
-from rest_framework.decorators import parser_classes
+# from rest_framework.decorators import parser_classes
 
 # class ProjectPagination(PageNumberPagination):
 #     page_size = 5
@@ -23,31 +23,6 @@ class ProjecViewSet(viewsets.ModelViewSet):
     # 역순정렬 하려면 > http://127.0.0.1:8000/projects?ordering=-likes 이렇게 앞에 -를 붙여야 함
 
     parser_classes = (MultiPartParser, FormParser)
-    
-    #@parser_classes([MultiPartParser, FormParser])
-    # def post(self, request):
-    #     try:
-    #         # print(request.data)
-    #         # print(request.POST)
-    #         # return Response({"data":request.POST})
-    #         # data = JSONParser().parse(request)
-            
-    #         data = request.data
-    #         #print(data)
-    #         # files = request.FILES
-    #         #print(files)
-    #         project_serializer = ProjectPostSerializer(data=data)
-    #         # preview_image_serializer = PreviewImageSerializer(data=files)
-    #         if project_serializer.is_valid(raise_exception=True):
-    #             # project_serializer.save()
-    #             print("=========")
-    #             project_serializer.save()
-                
-    #             return Response(project_serializer.data)
-    #         else:
-    #             return Response(project_serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-    #     except JSONDecodeError:
-    #         return JsonResponse({"result": "error","message": "Json decoding error"}, status= 400)
 
 
 class ProjectDetailAPIView(views.APIView):
