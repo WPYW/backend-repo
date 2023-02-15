@@ -1,10 +1,10 @@
 from json import JSONDecodeError
 from django.http import JsonResponse
-from .serializers import ProjectPostSerializer, PreviewImageSerializer
+from .serializers import ProjectPostSerializer, PreviewImageSerializer , CommentSerializer
 from rest_framework.parsers import JSONParser, MultiPartParser, FormParser
 from rest_framework import views, status, generics, viewsets
 from rest_framework.response import Response
-from .models import Project
+from .models import Project, Comment
 from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework.filters import OrderingFilter, SearchFilter
 # from rest_framework.pagination import PageNumberPagination
@@ -23,6 +23,7 @@ class ProjecViewSet(viewsets.ModelViewSet):
     # 역순정렬 하려면 > http://127.0.0.1:8000/projects?ordering=-likes 이렇게 앞에 -를 붙여야 함
 
     parser_classes = (MultiPartParser, FormParser)
+
 
 
 class ProjectDetailAPIView(views.APIView):
@@ -63,3 +64,23 @@ class ProjectIncreaseLikesAPIView(views.APIView):
             return Response(project_serializer.data)
         except JSONDecodeError:
             return JsonResponse({"result": "error","message": "Json decoding error"}, status= 400)
+
+
+class CommentViewSet(views.APIView): 
+    parser_classes = (MultiPartParser, FormParser)
+    def get_object(self, pk):
+        try:
+            return Project.objects.get(pk=pk)
+        except Project.DoesNotExist:
+            return JsonResponse({"result": "error","message": "Project does not exist"}, status= 400)
+
+    def post(self, request, pk):  
+        project = self.get_object(pk)
+        comment = Comment.objects.create(project=project, content=request.data.get("content"))
+        #serializer = CommentSerializer(data = request.data)
+        return JsonResponse({"success":"ok"},status = status.HTTP_201_CREATED)
+
+        #if serializer.is_valid():   
+        #    serializer.save()
+        #    return JsonResponse(serializer.data,status = status.HTTP_201_CREATED)
+        return JsonResponse(serializer.errors,status = status.HTTP_400_CREATED)        

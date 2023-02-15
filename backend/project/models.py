@@ -56,7 +56,6 @@ class Hashtag(
 		ordering = ["created"]
 
 	count = models.IntegerField(default=1, null=False)	
- 
 	def __str__(self):
 		return f'{self.title}({self.count})'
 
@@ -74,5 +73,23 @@ class Project_Hashtag(
 	project = models.ForeignKey(Project, on_delete=models.CASCADE, related_name='projectHashtag')
 	hashtag = models.ForeignKey(Hashtag, on_delete=models.CASCADE, related_name='hashtag')
 	
+	def __str__(self):
+		return f'{self.id}'
+
+
+
+
+class Comment(
+	Model, # PK > 이름 : id, 형식 : uuid
+	TimeStampedModel, 
+	ActivatorModel,
+):
+
+	class Meta:
+		verbose_name = 'Comment'
+		verbose_name_plural = "Comment"
+		ordering = ["-created"]
+	project = models.ForeignKey(Project, on_delete=models.CASCADE, related_name='comment')
+	content = models.CharField(max_length=200, null=False)
 	def __str__(self):
 		return f'{self.id}'
