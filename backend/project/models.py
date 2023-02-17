@@ -6,6 +6,7 @@ from django_extensions.db.models import (
 	TitleDescriptionModel
 )
 from django.conf import settings
+
 class Project(
     Model, # PK > 이름 : id, 형식 : uuid
     TitleDescriptionModel,
@@ -63,6 +64,7 @@ class Hashtag(
 	def __str__(self):
 		return f'{self.title}({self.count})'
 
+
 class Project_Hashtag(
 	Model, # PK > 이름 : id, 형식 : uuid
 	TimeStampedModel, 
@@ -81,18 +83,18 @@ class Project_Hashtag(
 		return f'{self.id}'
 
 
-
-
 class Comment(
 	Model, # PK > 이름 : id, 형식 : uuid
 	TimeStampedModel, 
 	ActivatorModel,
-):
+	):
 
 	class Meta:
 		verbose_name = 'Comment'
 		verbose_name_plural = "Comment"
 		ordering = ["-created"]
+	
+	nickname = models.CharField(max_length=200, null=False)
 	project = models.ForeignKey(Project, on_delete=models.CASCADE, related_name='comment')
 	content = models.CharField(max_length=200, null=False)
 	def __str__(self):

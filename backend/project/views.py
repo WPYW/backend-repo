@@ -7,6 +7,7 @@ from rest_framework.response import Response
 from .models import Project, Comment
 from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework.filters import OrderingFilter, SearchFilter
+import requests
 # from rest_framework.pagination import PageNumberPagination
 # from rest_framework.decorators import parser_classes
 
@@ -82,20 +83,45 @@ class ProjectIncreaseLikesAPIView(views.APIView):
 
 
 class CommentViewSet(views.APIView): 
+    # queryset  = Comment.objects.all()
+    # serializer_class = CommentSerializer
     parser_classes = (MultiPartParser, FormParser)
+    
     def get_object(self, pk):
         try:
             return Project.objects.get(pk=pk)
         except Project.DoesNotExist:
             return JsonResponse({"result": "error","message": "Project does not exist"}, status= 400)
+        
+    def create_random_nickname(self):
+        random_nickname = requests.get("https://nickname.hwanmoo.kr/?format=json").json()
+        return random_nickname.get("words")[0]
 
     def post(self, request, pk):  
-        project = self.get_object(pk)
-        comment = Comment.objects.create(project=project, content=request.data.get("content"))
-        #serializer = CommentSerializer(data = request.data)
-        return JsonResponse({"success":"ok"},status = status.HTTP_201_CREATED)
+        try:
+            project = self.get_object(pk)
+            random_nickname = self.create_random_nickname()
+            comment = Comment.objects.create(project=project, nickname = random_nickname, content=request.data.get("content"))
+            comment_serializer = CommentSerializer(comment)
+            return Response(comment_serializer.data)
+        except JSONDecodeError:
+            return JsonResponse({"result": "error","message": "Json decoding error"}, status= 400)
 
-        #if serializer.is_valid():   
-        #    serializer.save()
-        #    return JsonResponse(serializer.data,status = status.HTTP_201_CREATED)
-        return JsonResponse(serializer.errors,status = status.HTTP_400_CREATED)        
+    def get(self, request, pk):  
+        try:
+            project = self.get_object(pk)
+            comment = Comment.objects.filter(project=project)
+            comment_serializer = CommentSerializer(comment, many=True)
+            return Response(comment_serializer.data)
+        except JSONDecodeError:
+            return JsonResponse({"result": "error","message": "Json decoding error"}, status= 400)
+
+    # def retrieve(self, request, project_pk, comment_pk):
+    #     try:
+    #         project = self.get_object(project_pk)
+    #         comment = Comment.objects.filter(id=comment_pk, project=project)
+    #         comment_serializer = CommentSerializer(comment)
+    #         return Response(comment_serializer.data)
+    #     except JSONDecodeError:
+    #             return JsonResponse({"result": "error","message": "Json decoding error"}, status= 400)
+
