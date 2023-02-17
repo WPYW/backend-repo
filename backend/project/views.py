@@ -23,13 +23,6 @@ class ProjecViewSet(viewsets.ModelViewSet):
     # 역순정렬 하려면 > http://127.0.0.1:8000/projects?ordering=-likes 이렇게 앞에 -를 붙여야 함
 
     parser_classes = (MultiPartParser, FormParser)
-
-
-
-class ProjectDetailAPIView(views.APIView):
-    """
-    A simple APIView for creating contact entires.
-    """
     
     def get_object(self, pk):
         try:
@@ -37,7 +30,7 @@ class ProjectDetailAPIView(views.APIView):
         except Project.DoesNotExist:
             return JsonResponse({"result": "error","message": "Project does not exist"}, status= 400)
 
-    def get(self, request, pk):
+    def retrieve(self, request, pk):
         try:
             project = self.get_object(pk)
             project.views += 1
@@ -46,6 +39,28 @@ class ProjectDetailAPIView(views.APIView):
             return Response(project_serializer.data)
         except JSONDecodeError:
                 return JsonResponse({"result": "error","message": "Json decoding error"}, status= 400)
+
+
+# class ProjectDetailAPIView(views.APIView):
+#     """
+#     A simple APIView for creating contact entires.
+#     """
+    
+#     def get_object(self, pk):
+#         try:
+#             return Project.objects.get(pk=pk)
+#         except Project.DoesNotExist:
+#             return JsonResponse({"result": "error","message": "Project does not exist"}, status= 400)
+
+#     def retrieve(self, request, pk):
+#         try:
+#             project = self.get_object(pk)
+#             project.views += 1
+#             project.save()
+#             project_serializer = ProjectPostSerializer(project)
+#             return Response(project_serializer.data)
+#         except JSONDecodeError:
+#                 return JsonResponse({"result": "error","message": "Json decoding error"}, status= 400)
 
 
 class ProjectIncreaseLikesAPIView(views.APIView):

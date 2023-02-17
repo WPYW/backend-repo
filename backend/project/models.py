@@ -5,7 +5,7 @@ from django_extensions.db.models import (
 	ActivatorModel,
 	TitleDescriptionModel
 )
-
+from django.conf import settings
 class Project(
     Model, # PK > 이름 : id, 형식 : uuid
     TitleDescriptionModel,
@@ -24,7 +24,10 @@ class Project(
 	likes = models.IntegerField(default=0, null=False)
 
 	def __str__(self):
-		return f'{self.title}'
+		return f'{self.id}'
+
+def get_img_storage_path(instance, filename):
+	return 'project/images/%s/%s' % (instance.project.pk, filename)
 
 class Preview_Image(
 	Model, # PK > 이름 : id, 형식 : uuid
@@ -36,12 +39,13 @@ class Preview_Image(
 		verbose_name = 'PreviewImage'
 		verbose_name_plural = "PreviewImages"
 		ordering = ["created"]
-	
+
 	project = models.ForeignKey(Project, on_delete=models.CASCADE, related_name='previewImages')
-	image_url = models.ImageField(upload_to='project_image/{project.id}', null=False)
+	image_url = models.ImageField(upload_to=get_img_storage_path, null=False)
 	
 	def __str__(self):
-		return f'{self.id}'
+		return f'{self.project}'
+	
 
 class Hashtag(
 	Model, # PK > 이름 : id, 형식 : uuid
