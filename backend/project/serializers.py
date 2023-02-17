@@ -23,6 +23,7 @@ class ProjectPostSerializer(serializers.ModelSerializer):
 	
 	previewImages = serializers.SerializerMethodField()
 	projectHashtag = serializers.SerializerMethodField()
+	comment = serializers.SerializerMethodField()
 	projectTitle = CharField(source="title", required=True)
 	projectDescription = CharField(source="description", required=True)
 	githubLink = CharField(source="github_link", required=True)
@@ -32,6 +33,7 @@ class ProjectPostSerializer(serializers.ModelSerializer):
 		model = models.Project
 		fields = (
 	        'id',
+					'comment',
         	'previewImages',
 			'projectHashtag',
 			'projectTitle',
@@ -62,6 +64,15 @@ class ProjectPostSerializer(serializers.ModelSerializer):
 		for i in project_hashtag_serializer:
 			result_hashtag.append(dict(i).get('hashtag'))
 		return result_hashtag
+	
+	def get_comment(self, obj):
+		comment = obj.comment.all()
+		
+		comment_serializer = CommentSerializer(instance=comment, many=True, context=self.context).data
+		# result_hashtag = []
+		# for i in project_hashtag_serializer:
+		# 	result_hashtag.append(dict(i).get('hashtag'))
+		return comment_serializer
     
 	def create(self, validated_data):
 		project = models.Project.objects.create(**validated_data)
@@ -82,7 +93,10 @@ class ProjectPostSerializer(serializers.ModelSerializer):
 				get_hashtag = models.Hashtag.objects.create(title=hashtag)
 			models.Project_Hashtag.objects.create(project=project, hashtag=get_hashtag)
 		return project
-
+	# def create_comment(self, project):
+	# 		comment = self.context['request'].data
+	# 		post_comment = models.Comment.objects.create()
+	# 		models.Project_Comment.objects.creaete(project=project comment=post_comment)
 
 class HashtagSerializer(serializers.ModelSerializer):
 
@@ -120,3 +134,16 @@ class ProjectHashtagSerializer(serializers.ModelSerializer):
 			# 'deactivate_date',
 		)
 	
+class CommentSerializer(serializers.ModelSerializer):
+
+	class Meta: 	
+		model = models.Comment
+		fields = (
+	    'id',
+			'content',
+			'created',
+			'status',
+			'created',
+			'activate_date',
+			'deactivate_date',
+		)

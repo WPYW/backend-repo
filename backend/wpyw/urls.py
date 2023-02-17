@@ -11,5 +11,5 @@ urlpatterns = [
     #path('projects/', project_views.ProjectListAPIView.as_view()),
     #path('api/v1/projects/<uuid:pk>/', project_views.ProjectDetailAPIView.as_view()),
     path('api/v1/projects/<uuid:pk>/likes/', project_views.ProjectIncreaseLikesAPIView.as_view()),
+    path('projects/<uuid:pk>/comment/', project_views.CommentViewSet.as_view()), 
 ]
- 
