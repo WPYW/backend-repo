@@ -77,13 +77,23 @@ WSGI_APPLICATION = 'wpyw.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/4.1/ref/settings/#databases
 
+# DATABASES = {
+#     'default': {
+#         'ENGINE': 'django.db.backends.sqlite3',
+#         'NAME': BASE_DIR / 'db.sqlite3',
+#     }
+# }
+
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
+        'ENGINE': os.environ.get("POSTGRESQL_ENGINE"),
+        'HOST': os.environ.get("POSTGRESQL_HOST"),
+        'PORT': os.environ.get("POSTGRESQL_PORT"),
+        'NAME': os.environ.get("POSTGRESQL_NAME"),
+        'USER': os.environ.get("POSTGRESQL_USER"),
+        'PASSWORD': os.environ.get("POSTGRESQL_PASSWORD"),
     }
 }
-
 
 # Password validation
 # https://docs.djangoproject.com/en/4.1/ref/settings/#auth-password-validators
