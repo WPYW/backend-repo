@@ -1,8 +1,7 @@
 from . import models
 from rest_framework import serializers
 from rest_framework.fields import CharField
-from pathlib import Path
-import os
+
 class PreviewImageSerializer(serializers.ModelSerializer):
 	previewImages = serializers.ImageField(use_url=True, source="image_url", required=True)
 	class Meta:
@@ -23,7 +22,7 @@ class ProjectPostSerializer(serializers.ModelSerializer):
 	
 	previewImages = serializers.SerializerMethodField()
 	projectHashtag = serializers.SerializerMethodField()
-	comment = serializers.SerializerMethodField()
+	comment = serializers.SerializerMethodField() # list에서 comment 안 나오게 하고 싶으면 지우기
 	projectTitle = CharField(source="title", required=True)
 	projectDescription = CharField(source="description", required=True)
 	githubLink = CharField(source="github_link", required=True)
@@ -33,7 +32,7 @@ class ProjectPostSerializer(serializers.ModelSerializer):
 		model = models.Project
 		fields = (
 	        'id',
-					'comment',
+			'comment', # list에서 comment 안 나오게 하고 싶으면 지우기
         	'previewImages',
 			'projectHashtag',
 			'projectTitle',
@@ -67,11 +66,7 @@ class ProjectPostSerializer(serializers.ModelSerializer):
 	
 	def get_comment(self, obj):
 		comment = obj.comment.all()
-		
 		comment_serializer = CommentSerializer(instance=comment, many=True, context=self.context).data
-		# result_hashtag = []
-		# for i in project_hashtag_serializer:
-		# 	result_hashtag.append(dict(i).get('hashtag'))
 		return comment_serializer
     
 	def create(self, validated_data):
@@ -139,11 +134,11 @@ class CommentSerializer(serializers.ModelSerializer):
 	class Meta: 	
 		model = models.Comment
 		fields = (
-	    'id',
+	    	'id',
+			'nickname',
 			'content',
 			'created',
-			'status',
-			'created',
-			'activate_date',
-			'deactivate_date',
+			# 'status',
+			# 'activate_date',
+			# 'deactivate_date',
 		)
