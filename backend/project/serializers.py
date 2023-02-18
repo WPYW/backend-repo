@@ -26,7 +26,7 @@ class ProjectPostSerializer(serializers.ModelSerializer):
 	projectTitle = CharField(source="title", required=True)
 	projectDescription = CharField(source="description", required=True)
 	githubLink = CharField(source="github_link", required=True)
-	demositeLink = CharField(source="demo_link")
+	demositeLink = CharField(source="demo_link", required=False)
 	
 	class Meta:
 		model = models.Project
@@ -72,6 +72,7 @@ class ProjectPostSerializer(serializers.ModelSerializer):
 	def create(self, validated_data):
 		project = models.Project.objects.create(**validated_data)
 		images_data = self.context['request'].FILES
+
 		for image_data in images_data.getlist('previewImages'):
 			# 파일 이름 바꾸는 방법
    			# path_etc = image_data.name.split('.')[-1]
@@ -115,7 +116,7 @@ class ProjectHashtagSerializer(serializers.ModelSerializer):
 	hashtag = serializers.SlugRelatedField(
         read_only=True,
         slug_field='title'
-     )
+    )
  
 	class Meta:
 		model = models.Project_Hashtag

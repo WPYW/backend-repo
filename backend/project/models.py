@@ -20,7 +20,7 @@ class Project(
 		ordering = ["-created"]
 
 	github_link = models.CharField(max_length=200, null=False)
-	demo_link = models.CharField(max_length=200)
+	demo_link = models.CharField(max_length=200, null=True)
 	views = models.IntegerField(default=0, null=False)
 	likes = models.IntegerField(default=0, null=False)
 
