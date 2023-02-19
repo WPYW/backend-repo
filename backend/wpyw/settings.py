@@ -32,7 +32,7 @@ INSTALLED_APPS = [
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
-    'django.contrib.sessions',
+    'django.contrib.sessions',  
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'django_extensions', #Great packaged to access abstract models
@@ -40,6 +40,7 @@ INSTALLED_APPS = [
     'rest_framework', #DRF package
     'storages',
     'project', # New app
+    'corsheaders',
 ]
 
 MIDDLEWARE = [
@@ -50,6 +51,7 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    'corsheaders.middleware.CorsMiddleware',
 ]
 
 ROOT_URLCONF = 'wpyw.urls'
@@ -72,6 +74,12 @@ TEMPLATES = [
 
 WSGI_APPLICATION = 'wpyw.wsgi.application'
 
+CORS_ALLOWED_ORIGINS = [
+    'http://localhost:5173',    
+    'http://127.0.0.1:5173',
+    'http://0.0.0.0:5173',
+    'http://127.0.0.0:5173',
+]
 
 # Database
 # https://docs.djangoproject.com/en/4.1/ref/settings/#databases
