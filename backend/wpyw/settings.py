@@ -41,6 +41,7 @@ INSTALLED_APPS = [
     'storages',
     'project', # New app
     'corsheaders',
+    'recruit',
 ]
 
 MIDDLEWARE = [
