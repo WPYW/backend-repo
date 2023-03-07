@@ -21,7 +21,7 @@ class Recruit(
     verbose_name = 'Recruit'
     verbose_name_plural = "Recruits"
     ordering =  ["-created"]
-  recruit_type = models.CharField(max_length=10, null = False, choices=[(tag, tag.value) for tag in Types])
+  recruit_type = models.CharField(max_length=10, null = False, choices=[('STUDY','Study'), ('PROJECT','project')])
   recruit_member = models.IntegerField( null = False)
   recruit_start  = models.DateField(null = False)
   recruit_end  = models.DateField(null = False)
@@ -30,6 +30,9 @@ class Recruit(
   shut = models.BooleanField(null = False)
   is_remote = models.BooleanField(null = False)
   password = models.CharField(max_length=200,null = False)
+  dday = models.IntegerField(default=0)
+  views = models.IntegerField(default=0, null=False)
+  likes = models.IntegerField(default=0,null=False)
   # recruit_title = title 
   # recruit_ descript = description 
   def __str__(self):
@@ -103,3 +106,19 @@ class Recruit_Position(
   position = models.ForeignKey(Position, on_delete=models.CASCADE, related_name='positions')
   def __str__(self):
     return f'{self.id}'
+  
+
+
+class RecruitComment(
+  Model,
+  TimeStampedModel,
+  ActivatorModel,
+  TitleDescriptionModel,
+) : 
+  class Meta: 
+    ordering = ['created']
+  nickname = models.CharField(default="", max_length=200, null=False)
+  recruit = models.ForeignKey(Recruit, on_delete=models.CASCADE, related_name='recruitName')
+  content = models.CharField(default="", max_length=200, null=False)
+  def __str__(self):
+    return f'{self}'
