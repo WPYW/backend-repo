@@ -18,6 +18,6 @@ urlpatterns = [
     path('api/v1/projects/<uuid:pk>/comments/', project_views.CommentViewSet.as_view()), # 
     #path('api/v1/recruits/<uuid:pk>/dday/',)
     # path('api/v1/recruits/<uuid:pk>/likes/', recruit_views.RecruitIncreaseAPIView.as_view()), # 
-    # path('api/v1/recruits/<uuid:pk>/comments/', recruit_views.CommentViewSet.as_view()), # 
+    path('api/v1/recruits/<uuid:pk>/comments/', recruit_views.CommentViewSet.as_view()), # 
     
 ]

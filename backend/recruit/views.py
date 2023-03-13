@@ -4,7 +4,7 @@ from django.http import JsonResponse
 from django.shortcuts import render
 from rest_framework.response import Response
 from recruit.models import Recruit
-from .models import RecruitComment
+from .models import Comment
 from rest_framework.parsers import JSONParser, MultiPartParser, FormParser
 from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework.filters import OrderingFilter, SearchFilter
@@ -40,26 +40,34 @@ class RecruitViewSet(viewsets.ModelViewSet):
       return Response(recruit_serializer.data)
     except JSONDecodeError: 
       return JsonResponse({"result": "error","message": "Json decoding error"}, status= 400)
-  # def put(self ,request ,pk , format =None):
-  #   recruit = self.get_object(pk)
-  #   recruit_serializer = RecruitPostSerializer(recruit)
-  #   if check_password(request.data, recruit.password):
-  #     if recruit_serializer.is_valid():
-  #       recruit_serializer.save()
-  #       return Response(recruit_serializer.data) 
-  #   return JsonResponse({"result": "error","message": "Json decoding error"}, status= 400)
-  # def delete(self ,request ,pk , format =None):
-  #   recruit = self.get_object(pk)
-  #   recruit.delete()
-  #   return Response(status=status.HTTP_204_NO_CONTENT) 
-
+  def put(self ,request ,pk ):
+    try:
+      recruit = self.get_object(pk)
+      recruit_serializer = RecruitPostSerializer(recruit)   
+      if recruit_serializer.is_valid():
+        if check_password(request.data, recruit.password):
+          recruit_serializer.save()
+          return Response(recruit_serializer.data) 
+    except JSONDecodeError: 
+        return JsonResponse({"result": "error","message": "Json decoding error"}, status= 400)
+  def delete(self ,request ,pk):
+    try:
+      recruit = self.get_object(pk)
+      recruit_serializer = RecruitPostSerializer(recruit)   
+      if recruit_serializer.is_valid():
+        if check_password(request.data, recruit.password):
+          recruit.delete()
+          return Response(status=status.HTTP_204_NO_CONTENT)
+        else:
+          return Response("invalid password")    
+    except JSONDecodeError: 
+      return JsonResponse({"result": "error","message": "Json decoding error"}, status= 400)
 
 
 class CommentViewSet(views.APIView): 
     # queryset  = Comment.objects.all()
     # serializer_class = CommentSerializer
     parser_classes = (MultiPartParser, FormParser)
-    
     def get_object(self, pk):
         try:
             return Recruit.objects.get(pk=pk)
@@ -72,7 +80,7 @@ class CommentViewSet(views.APIView):
         try:
             recruit = self.get_object(pk)
             random_nickname = self.create_random_nickname()
-            comment = RecruitComment.objects.create(recruit=recruit, nickname = random_nickname, content=request.data.get("content"))
+            comment = Comment.objects.create(recruit=recruit, nickname = random_nickname, content=request.data.get("content"))
             comment_serializer = CommentSerializer(comment)
             return Response(comment_serializer.data)
         except JSONDecodeError:
@@ -80,7 +88,7 @@ class CommentViewSet(views.APIView):
     def get(self, request, pk):  
         try:
             recruit = self.get_object(pk)
-            comment = RecruitComment.objects.filter(recruit=recruit)
+            comment = Comment.objects.filter(recruit=recruit)
             comment_serializer = CommentSerializer(comment, many=True)
             return Response(comment_serializer.data)
         except JSONDecodeError:

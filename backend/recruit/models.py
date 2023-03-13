@@ -7,9 +7,6 @@ from django_extensions.db.models import (
 	TitleDescriptionModel
 )
 
-class Types(Enum):
-  study = "study"
-  project = "project"
 
 class Recruit(
   Model,
@@ -21,10 +18,10 @@ class Recruit(
     verbose_name = 'Recruit'
     verbose_name_plural = "Recruits"
     ordering =  ["-created"]
-  recruit_type = models.CharField(max_length=10, null = False, choices=[('STUDY','Study'), ('PROJECT','project')])
-  recruit_member = models.IntegerField( null = False)
-  recruit_start  = models.DateField(null = False)
-  recruit_end  = models.DateField(null = False)
+  types = models.CharField(max_length=10, null = False)
+  member = models.IntegerField( null = False)
+  start  = models.DateField(null = False)
+  end  = models.DateField(null = False)
   deadline = models.DateField(null = False)
   contact_Info = models.CharField(max_length=200, null=False)
   shut = models.BooleanField(null = False)
@@ -39,34 +36,32 @@ class Recruit(
     return f'{self.id}'
 
 
-class TechSkill(
+class Techskill(
   Model,
   TimeStampedModel, 
 	ActivatorModel,
-	TitleDescriptionModel,
 ):
   class Meta:
-    verbose_name = 'TechSKill'
-    verbose_name_plural = "TechSkills"
+    verbose_name = 'Techskill'
+    verbose_name_plural = "Techskills"
     ordering = ["created"]
   #   recruit = models.ForeignKey(Recruit, on_delete=models.CASCADE)
-  #   techskill = models.CharField(max_length=200, null=False)
+  techskill = models.CharField(max_length=200, null=False, default=" ")
   def __str__(self):
-    return f'{self.title}'
+    return f'{self.techskill}'
 
 
 class Recruit_Techskill(
   Model,
   TimeStampedModel, 
 	ActivatorModel,
-	TitleDescriptionModel,
   ):
   class Meta:
     verbose_name = 'Recruit_Techskill'
     verbose_name_plural = "Recruit_Techskills"
     ordering = ["created"]
   recruit = models.ForeignKey(Recruit, on_delete=models.CASCADE, related_name='recruitTechskill')
-  techskill = models.ForeignKey(TechSkill, on_delete=models.CASCADE,related_name='TechSkill')
+  techskill = models.ForeignKey(Techskill, on_delete=models.CASCADE,related_name='Techskill')
   def __str__(self):
     return f'{self.id}'
 
@@ -85,18 +80,17 @@ class Position(
 	ActivatorModel,
 ):
   class Meta:
-    verbose_name = 'TechSKill'
-    verbose_name_plural = "TechSkills"
+    verbose_name = 'Position'
+    verbose_name_plural = "Positions"
     ordering = ["created"]
-  position = models.CharField(max_length=200, null = False,choices=[(tag, tag.value) for tag in PositionTypes] )    
+  position = models.CharField(default='',max_length=50, null=False)
   def __str__(self):
-      return f'({self.positon})'
+      return f'{self.position}'
 
 class Recruit_Position(
   Model,
   TimeStampedModel, 
 	ActivatorModel,
-	TitleDescriptionModel,
 ):
   class Meta:
     verbose_name = 'Recruit_Position'
@@ -109,16 +103,17 @@ class Recruit_Position(
   
 
 
-class RecruitComment(
+class Comment(
   Model,
   TimeStampedModel,
   ActivatorModel,
-  TitleDescriptionModel,
 ) : 
   class Meta: 
-    ordering = ['created']
-  nickname = models.CharField(default="", max_length=200, null=False)
-  recruit = models.ForeignKey(Recruit, on_delete=models.CASCADE, related_name='recruitName')
-  content = models.CharField(default="", max_length=200, null=False)
+    verbose_name = 'Comment'
+    verbose_name_plural = "Comment"
+    ordering = ['-created']
+  nickname = models.CharField(max_length=200, null=False)
+  recruit = models.ForeignKey(Recruit, on_delete=models.CASCADE, related_name='comment')
+  content = models.CharField( max_length=200, null=False)
   def __str__(self):
-    return f'{self}'
+    return f'{self.id}'

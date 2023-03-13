@@ -8,25 +8,26 @@ from django.contrib.auth.hashers import make_password
 class  RecruitPostSerializer (serializers.ModelSerializer): 
   recruitTechskill = serializers.SerializerMethodField()
   recruitPosition = serializers.SerializerMethodField()
-  recruitTitle = CharField(source="title", required=True)
-  recruitDescription = CharField(source="description", required=True)
-  recruitType = CharField(source="recruit_type", required=True)
-  recruitMember = CharField(source="recruit_member", required=True)
-  startDate = DateField(source="recruit_start", required=True)
-  endDate = DateField(source="recruit_end", required=True)
+  title = CharField(required=True)
+  description = CharField( required=True)
+  types = CharField( required=True)
+  member = CharField(required=True)
+  startDate = DateField(source="start", required=True)
+  endDate = DateField(source="end", required=True)
   is_remote = BooleanField (required=True)
   deadline = DateField(required=True)
   contact= CharField(source="contact_Info", required=True) 
   password = CharField(required=True, write_only=True)
   shut = BooleanField(required=True)
+  comment = serializers.SerializerMethodField()
   class Meta: 
     model = models.Recruit
     fields = (
       'id',
-			'recruitTitle', # list에서 comment 안 나오게 하고 싶으면 지우기
-      'recruitDescription',
-			'recruitType',
-			'recruitMember',
+			'title', # list에서 comment 안 나오게 하고 싶으면 지우기
+      'description',
+			'types',
+			'member',
       'recruitTechskill',
       'recruitPosition',
 			'startDate',
@@ -39,6 +40,7 @@ class  RecruitPostSerializer (serializers.ModelSerializer):
       'password',
       'views',
       'likes',
+      'comment'
       )
     extra_kwargs= {
       'password' : {'write_only' : True},
@@ -46,30 +48,49 @@ class  RecruitPostSerializer (serializers.ModelSerializer):
     }
   def get_recruitPosition(self, obj):
     recruit_Position = obj.recruitPosition.all()
-    position_serializer = PositionSerializer(instance=recruit_Position, many=True, context=self.context).data
+    recruit_position_serializer = PositionSerializer(instance=recruit_Position, many=True, context=self.context).data
     result_position = []
-    for i in position_serializer:
+    for i in recruit_position_serializer:
       result_position.append(dict(i).get('position'))
     return result_position
   
   def get_recruitTechskill(self,obj):
     recruitTechskill = obj.recruitTechskill.all()
-    techSkill_serializer = TechskillSerializer(instance=recruitTechskill, many=True, context=self.context).data
-    result_techSkill = []
-    for i in techSkill_serializer: 
-      result_techSkill.append(dict(i).get('techSkill'))
-    return result_techSkill
+    techskill_serializer = TechskillSerializer(instance=recruitTechskill, many=True, context=self.context).data
+    result_techskill = []
+    for i in techskill_serializer: 
+      result_techskill.append(dict(i).get('techskill'))
+    return result_techskill
   
+  def get_comment(self, obj):
+    comment = obj.comment.all()
+    comment_serializer = CommentSerializer(instance=comment, many=True, context=self.context).data
+    return comment_serializer
+    
+
   def create(self, validated_data): 
   # passwords = validated_data.pop('password',None)
     recruit = models.Recruit.objects.create(**validated_data)
     position = self.context['request'].data
+    techskill = self.context['request'].data
     for position in position.getlist('recruitPosition'):
-      get_position = models.Position.objects.filter(title=position)
+      get_position = models.Position.objects.filter(position=position)
       if get_position:
-        get_position =models.Position.objects.create(title=position)
-      models.recruitPosition.objects.create(recruit=recruit,position=get_position)
+        get_position = models.Position.objects.get(position=position)
+      else:
+        get_position =models.Position.objects.create(position=position)
+      models.Recruit_Position.objects.create(recruit=recruit,position=get_position)
+    for techskill in techskill.getlist('recruitTechskill'):
+      get_Techskill = models.Techskill.objects.filter(techskill=techskill)
+      if get_Techskill:
+        get_Techskill = models.Techskill.objects.get(techskill=techskill)
+      else:
+        get_Techskill= models.Techskill.objects.create(techskill=techskill)
+      models.Recruit_Techskill.objects.create(recruit=recruit,techskill=get_Techskill)
+    
     recruit.password = make_password(validated_data['password'])
+    Dday = recruit.deadline - date.today()
+    recruit.dday = Dday.days
     recruit.save()
     return recruit
 
@@ -77,11 +98,10 @@ class  RecruitPostSerializer (serializers.ModelSerializer):
 class TechskillSerializer(serializers.ModelSerializer):
   
   class Meta: 
-      model = models.TechSkill
+      model = models.Techskill
       fields = (
         'id',
-        'techSkill',
-        'logo_image',
+        'techskill',
         'created',
         'modified',
         'status',
@@ -89,7 +109,7 @@ class TechskillSerializer(serializers.ModelSerializer):
         'deactivate_date',
       )
 class RecruitTechskillSerializer(serializers.ModelSerializer):
-  techSkill = serializers.SlugRelatedField(
+  techskill = serializers.SlugRelatedField(
     slug_field='techSkill',
     read_only=True
   )
@@ -97,7 +117,7 @@ class RecruitTechskillSerializer(serializers.ModelSerializer):
       model = models.Recruit_Techskill
       fields = (
         # 'id',
-        'techSkill',
+        'techskill',
         'logo_image',
       #   'created',
       #   'modified',
@@ -111,7 +131,7 @@ class PositionSerializer(serializers.ModelSerializer):
     model = models.Position
     fields = (
       'id',
-      'position'
+      'position',
       'created',
       'modified',
       'status',
@@ -141,7 +161,7 @@ class RecruitPositionSerializer(serializers.ModelSerializer):
 class CommentSerializer(serializers.ModelSerializer):
 
 	class Meta: 	
-		model = models.RecruitComment
+		model = models.Comment
 		fields = (
 	    	'id',
 			'nickname',
