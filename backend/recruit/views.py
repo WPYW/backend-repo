@@ -1,6 +1,6 @@
 from datetime import date
 from json import JSONDecodeError
-from django.http import JsonResponse
+from django.http import HttpResponse, JsonResponse
 from django.shortcuts import render
 from rest_framework.response import Response
 from recruit.models import Recruit
@@ -12,6 +12,7 @@ from .serializers import CommentSerializer, RecruitPostSerializer, RecruitPositi
 from django.contrib.auth.hashers import check_password
 import requests
 from rest_framework import views, status, generics, viewsets
+from django.contrib.auth.hashers import make_password
 # Create your views here.
 
 
@@ -21,14 +22,13 @@ class RecruitViewSet(viewsets.ModelViewSet):
   #어떤것들을 필터링해서 보여줄지, 
   filter_backends = [DjangoFilterBackend, SearchFilter, OrderingFilter]
   parser_classes = (MultiPartParser, FormParser)
-  #search_fields = ['title','position','techskill']
+  search_fields = ['title']
   ordering_fields = ['created','likes','views']
   def get_object(self, pk):
     try:
         return Recruit.objects.get(pk=pk)
     except Recruit.DoesNotExist:
         return JsonResponse({"result": "error","message": "Project does not exist"}, status= 400)
-  
   def retrieve(self,request, pk):
     try: 
       recruit = self.get_object(pk)
@@ -40,28 +40,48 @@ class RecruitViewSet(viewsets.ModelViewSet):
       return Response(recruit_serializer.data)
     except JSONDecodeError: 
       return JsonResponse({"result": "error","message": "Json decoding error"}, status= 400)
-  def put(self ,request ,pk ):
+  def update(self ,request ,pk):
     try:
-      recruit = self.get_object(pk)
-      recruit_serializer = RecruitPostSerializer(recruit)   
-      if recruit_serializer.is_valid():
-        if check_password(request.data, recruit.password):
-          recruit_serializer.save()
-          return Response(recruit_serializer.data) 
+      recruits = self.get_object(pk)
+      recruit_serializer = RecruitPostSerializer(recruits, data = request.data)  
+      if recruit_serializer.is_valid(raise_exception=True):
+        # if check_password(request.data.__getitem__('password'), recruits.password):
+        # #recruit_serializer.password = make_password(['password'])
+        #   self.perform_update(recruit_serializer)
+        self.perform_update(recruit_serializer)
+      return Response(recruit_serializer.data)  
     except JSONDecodeError: 
         return JsonResponse({"result": "error","message": "Json decoding error"}, status= 400)
+
+  # def put(self, request,pk, *args, **kwargs):
+  #   #recruit = self.get_object()
+  #   recruit = recruit.objects.get(pk = kwargs['pk'] )
+  #   update_serial = RecruitPostSerializer(recruit, data = request.data)
+  #   if update_serial.is_valid():
+  #     update_serial.save()
+  #     return JsonResponse(
+  #           update_serial.data, 
+  #           status = status.HTTP_201_CREATED, safe=False
+  #           )
+  #   return JsonResponse(
+  #       update_serial.errors, 
+  #       status = status.HTTP_400_BAD_REQUEST, safe=False
+  #       )
   def delete(self ,request ,pk):
-    try:
-      recruit = self.get_object(pk)
-      recruit_serializer = RecruitPostSerializer(recruit)   
-      if recruit_serializer.is_valid():
-        if check_password(request.data, recruit.password):
-          recruit.delete()
-          return Response(status=status.HTTP_204_NO_CONTENT)
-        else:
-          return Response("invalid password")    
-    except JSONDecodeError: 
-      return JsonResponse({"result": "error","message": "Json decoding error"}, status= 400)
+    # try:
+    #   recruits = self.get_object(pk)
+    #   recruit_serializer = RecruitPostSerializer(recruits, data = request.data)  
+    #   if check_password(request.data.__getitem__('password'), recruits.password):
+    #     if recruit_serializer.is_valid(raise_exception=True):
+    #       self.delete()
+    #       return Response(status=status.HTTP_204_NO_CONTENT)
+    #   return HttpResponse({'Success':"Deleted Successfully."})  
+    # except JSONDecodeError: 
+    #   return JsonResponse({"result": "error","message": "Json decoding error"}, status= 400)
+    
+    recruit = self.get_object(pk)
+    recruit.delete()
+        #   return HttpResponse({'Success':"Deleted Successfully."})   
 
 
 class CommentViewSet(views.APIView): 

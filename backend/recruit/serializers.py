@@ -86,15 +86,37 @@ class  RecruitPostSerializer (serializers.ModelSerializer):
         get_Techskill = models.Techskill.objects.get(techskill=techskill)
       else:
         get_Techskill= models.Techskill.objects.create(techskill=techskill)
-      models.Recruit_Techskill.objects.create(recruit=recruit,techskill=get_Techskill)
-    
+    models.Recruit_Techskill.objects.create(recruit=recruit,techskill=get_Techskill)
     recruit.password = make_password(validated_data['password'])
     Dday = recruit.deadline - date.today()
     recruit.dday = Dday.days
     recruit.save()
     return recruit
+  # def update(self, instance,  validated_data):
+
+  #   instance.title = validated_data('title', instance.title)
+  #   instance.description = validated_data('description', instance.description)    
+  #   instance.types = validated_data('types', instance.types)
+  #   instance.member = validated_data('member', instance.member)
+  #   instance.recruitTechskill = validated_data('recruitTechskill', instance.recruitTechskill)
+  #   instance.recruitPosition = validated_data('recruitPosition', instance.recruitPosition)
+  #   instance.startDate = validated_data('startDate', instance.startDate)
+  #   instance.endDate = validated_data('endDate', instance.endDate)
+  #   instance.is_remote= validated_data('is_remote', instance.is_remote)
+  #   instance.deadline = validated_data('deadline', instance.deadline)
+  #   instance.contact = validated_data('contact ', instance.contact)
+  #   instance.shut = validated_data('shut', instance.shut)
+  #   print(instance)
+  #   instance.save()
 
 
+
+class RecruitPutSerializer (serializers.ModelSerializer):
+  class Meta: 
+    model = models.Recruit
+    fields =(
+      
+    )
 class TechskillSerializer(serializers.ModelSerializer):
   
   class Meta: 
@@ -171,3 +193,5 @@ class CommentSerializer(serializers.ModelSerializer):
 			# 'activate_date',
 			# 'deactivate_date',
 		)
+
+

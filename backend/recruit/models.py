@@ -1,6 +1,7 @@
 from django.db import models
 from utils.model_abstracts import Model
 from enum import Enum
+from django.contrib.auth.hashers import make_password
 from django_extensions.db.models import (
 	TimeStampedModel, 
 	ActivatorModel,
