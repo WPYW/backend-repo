@@ -20,11 +20,11 @@ class PreviewImageSerializer(serializers.ModelSerializer):
 
 class ProjectPostSerializer(serializers.ModelSerializer):
 	
-	previewImages = serializers.SerializerMethodField()
-	projectHashtag = serializers.SerializerMethodField()
-	comment = serializers.SerializerMethodField() # list에서 comment 안 나오게 하고 싶으면 지우기
-	projectTitle = CharField(source="title", required=True)
-	projectDescription = CharField(source="description", required=True)
+	thumbnails = serializers.SerializerMethodField()
+	hashtags = serializers.SerializerMethodField()
+	comments = serializers.SerializerMethodField() # list에서 comment 안 나오게 하고 싶으면 지우기
+	title = CharField( required=True)
+	description = CharField(required=True)
 	githubLink = CharField(source="github_link", required=True)
 	demositeLink = CharField(source="demo_link", required=False)
 	
@@ -32,13 +32,13 @@ class ProjectPostSerializer(serializers.ModelSerializer):
 		model = models.Project
 		fields = (
 	        'id',
-			'comment', # list에서 comment 안 나오게 하고 싶으면 지우기
-        	'previewImages',
-			'projectHashtag',
-			'projectTitle',
-			'projectDescription',
+			'comments', # list에서 comment 안 나오게 하고 싶으면 지우기
+        	'thumbnails',
+			'hashtags',
+			'title',
+			'description',
 			'githubLink',
-   			'demositeLink',
+   		'demositeLink',
 			'views',
 			'likes',
 			'created',
@@ -48,7 +48,7 @@ class ProjectPostSerializer(serializers.ModelSerializer):
 			# 'deactivate_date',
 		)
 
-	def get_previewImages(self, obj):
+	def get_thumbnails(self, obj):
 		image = obj.previewImages.all() 
 		preview_image_serializer = PreviewImageSerializer(instance=image, many=True, context=self.context).data
 		result_preview_image = []
@@ -56,7 +56,7 @@ class ProjectPostSerializer(serializers.ModelSerializer):
 			result_preview_image.append(dict(i).get('previewImages'))
 		return result_preview_image
 
-	def get_projectHashtag(self, obj):
+	def get_hashtags(self, obj):
 		project_hashtag = obj.projectHashtag.all()
 		project_hashtag_serializer = ProjectHashtagSerializer(instance=project_hashtag, many=True, context=self.context).data
 		result_hashtag = []
@@ -64,7 +64,7 @@ class ProjectPostSerializer(serializers.ModelSerializer):
 			result_hashtag.append(dict(i).get('hashtag'))
 		return result_hashtag
 	
-	def get_comment(self, obj):
+	def get_comments(self, obj):
 		comment = obj.comment.all()
 		comment_serializer = CommentSerializer(instance=comment, many=True, context=self.context).data
 		return comment_serializer
