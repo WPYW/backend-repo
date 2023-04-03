@@ -13,8 +13,6 @@ from django.contrib.auth.hashers import check_password
 import requests
 from rest_framework import views, status, generics, viewsets
 from django.contrib.auth.hashers import make_password
-# Create your views here.
-
 
 class RecruitViewSet(viewsets.ModelViewSet):
   queryset  = Recruit.objects.all()

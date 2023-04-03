@@ -67,7 +67,6 @@ class  RecruitPostSerializer (serializers.ModelSerializer):
     comment_serializer = CommentSerializer(instance=comment, many=True, context=self.context).data
     return comment_serializer
     
-
   def create(self, validated_data): 
   # passwords = validated_data.pop('password',None)
     recruit = models.Recruit.objects.create(**validated_data)
@@ -92,6 +91,7 @@ class  RecruitPostSerializer (serializers.ModelSerializer):
     recruit.dday = Dday.days
     recruit.save()
     return recruit
+  
   # def update(self, instance,  validated_data):
 
   #   instance.title = validated_data('title', instance.title)
@@ -109,14 +109,13 @@ class  RecruitPostSerializer (serializers.ModelSerializer):
   #   print(instance)
   #   instance.save()
 
-
-
 class RecruitPutSerializer (serializers.ModelSerializer):
   class Meta: 
     model = models.Recruit
     fields =(
       
     )
+    
 class TechskillSerializer(serializers.ModelSerializer):
   
   class Meta: 
@@ -130,6 +129,7 @@ class TechskillSerializer(serializers.ModelSerializer):
         'activate_date',
         'deactivate_date',
       )
+      
 class RecruitTechskillSerializer(serializers.ModelSerializer):
   techskill = serializers.SlugRelatedField(
     slug_field='techSkill',
@@ -178,14 +178,11 @@ class RecruitPositionSerializer(serializers.ModelSerializer):
 			# 'deacti
       )
 
-
-
 class CommentSerializer(serializers.ModelSerializer):
-
 	class Meta: 	
 		model = models.Comment
 		fields = (
-	    	'id',
+	    'id',
 			'nickname',
 			'content',
 			'created',
@@ -193,5 +190,4 @@ class CommentSerializer(serializers.ModelSerializer):
 			# 'activate_date',
 			# 'deactivate_date',
 		)
-
 
