@@ -19,16 +19,11 @@ class Recruit(
     verbose_name = 'Recruit'
     verbose_name_plural = "Recruits"
     ordering =  ["-created"]
-  types = models.CharField(max_length=10, null = False)
   member = models.IntegerField( null = False)
-  start  = models.DateField(null = False)
-  end  = models.DateField(null = False)
   deadline = models.DateField(null = False)
   contact_Info = models.CharField(max_length=200, null=False)
   shut = models.BooleanField(null = False)
-  is_remote = models.BooleanField(null = False)
   password = models.CharField(max_length=200,null = False)
-  dday = models.IntegerField(default=0)
   views = models.IntegerField(default=0, null=False)
   likes = models.IntegerField(default=0,null=False)
   # recruit_title = title 

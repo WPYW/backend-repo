@@ -30,8 +30,6 @@ class RecruitViewSet(viewsets.ModelViewSet):
   def retrieve(self,request, pk):
     try: 
       recruit = self.get_object(pk)
-      Dday = recruit.deadline - date.today() 
-      recruit.dday = Dday.days
       recruit.views += 1
       recruit.save()
       recruit_serializer = RecruitPostSerializer(recruit)
@@ -43,9 +41,6 @@ class RecruitViewSet(viewsets.ModelViewSet):
       recruits = self.get_object(pk)
       recruit_serializer = RecruitPostSerializer(recruits, data = request.data)  
       if recruit_serializer.is_valid(raise_exception=True):
-        # if check_password(request.data.__getitem__('password'), recruits.password):
-        # #recruit_serializer.password = make_password(['password'])
-        #   self.perform_update(recruit_serializer)
         self.perform_update(recruit_serializer)
       return Response(recruit_serializer.data)  
     except JSONDecodeError: 
