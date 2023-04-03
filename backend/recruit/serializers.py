@@ -169,4 +169,3 @@ class CommentSerializer(serializers.ModelSerializer):
 			# 'deactivate_date',
 		)
 
-

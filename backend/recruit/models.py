@@ -14,7 +14,7 @@ class Recruit(
   TimeStampedModel, 
 	ActivatorModel,
 	TitleDescriptionModel,
-):
+  ):
   class Meta: 
     verbose_name = 'Recruit'
     verbose_name_plural = "Recruits"
@@ -36,7 +36,7 @@ class Techskill(
   Model,
   TimeStampedModel, 
 	ActivatorModel,
-):
+  ):
   class Meta:
     verbose_name = 'Techskill'
     verbose_name_plural = "Techskills"
@@ -45,7 +45,6 @@ class Techskill(
   techskill = models.CharField(max_length=200, null=False, default=" ")
   def __str__(self):
     return f'{self.techskill}'
-
 
 class Recruit_Techskill(
   Model,
@@ -61,7 +60,6 @@ class Recruit_Techskill(
   def __str__(self):
     return f'{self.id}'
 
-
 class PositionTypes(Enum):
   frontend = 'frontend'
   backend = 'backend'
@@ -69,12 +67,11 @@ class PositionTypes(Enum):
   mobile  = 'mobile'
   devops = 'devops'
   
-
 class Position(
   Model,
   TimeStampedModel, 
 	ActivatorModel,
-):
+  ):
   class Meta:
     verbose_name = 'Position'
     verbose_name_plural = "Positions"
@@ -87,7 +84,7 @@ class Recruit_Position(
   Model,
   TimeStampedModel, 
 	ActivatorModel,
-):
+  ):
   class Meta:
     verbose_name = 'Recruit_Position'
     verbose_name_plural = "Recruit_Positions"
@@ -96,14 +93,12 @@ class Recruit_Position(
   position = models.ForeignKey(Position, on_delete=models.CASCADE, related_name='positions')
   def __str__(self):
     return f'{self.id}'
-  
-
 
 class Comment(
   Model,
   TimeStampedModel,
   ActivatorModel,
-) : 
+  ): 
   class Meta: 
     verbose_name = 'Comment'
     verbose_name_plural = "Comment"
