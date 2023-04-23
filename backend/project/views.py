@@ -8,6 +8,8 @@ from .models import Project, Comment
 from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework.filters import OrderingFilter, SearchFilter
 import requests
+from rest_framework.permissions import IsAuthenticatedOrReadOnly
+from rest_framework.authentication import SessionAuthentication, BasicAuthentication
 # from rest_framework.pagination import PageNumberPagination
 # from rest_framework.decorators import parser_classes
 
@@ -15,6 +17,8 @@ import requests
 #     page_size = 5
 
 class ProjecViewSet(viewsets.ModelViewSet):
+    authentication_classes = [BasicAuthentication, SessionAuthentication]
+    permission_classes = [IsAuthenticatedOrReadOnly]
     queryset  = Project.objects.all()
     serializer_class = ProjectPostSerializer
     # pagination_class = ProjectPagination

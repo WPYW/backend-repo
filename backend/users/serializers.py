@@ -10,12 +10,12 @@ class UserSerializer(serializers.ModelSerializer):
     def create(self, validated_data):
         
         user = Users.objects.create_user(
-            username = validated_data['username'],
+            email = validated_data['email'],
             password = validated_data['password'],
-            # nickname = validated_data['nickname'],
-            # birthday = validated_data['birthday'],
-            # thumbail_image_url = validated_data['thumbail_image_url'],
-            # social = validated_data['social'],
+            nickname = validated_data['nickname'],
+            birthday = validated_data['birthday'],
+            thumbail_image_url = validated_data['thumbail_image_url'],
+            social = validated_data['social'],
         )
         
         return user

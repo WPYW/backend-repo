@@ -341,40 +341,28 @@ def kakao_callback(request):
     secret_api_key = getattr(settings, 'SOCIAL_AUTH_KAKAO_SECRET')
     code = request.GET.get("code")
     
-    print("==========access_token=========")
-    print(code)
-    print("===================")
-    
     redirect_uri = KAKAO_CALLBACK_URI
     """
     Access Token Request
     """
-    print("=================Access Token Request==================")
     token_req = requests.get(
         f"https://kauth.kakao.com/oauth/token?grant_type=authorization_code&client_id={rest_api_key}&client_secret={secret_api_key}&redirect_uri={redirect_uri}&code={code}")
     token_req_json = token_req.json()
-    print(token_req_json)
     error = token_req_json.get("error")
     if error is not None:
         raise JSONDecodeError(error)
     access_token = token_req_json.get("access_token")
-    print("=================END==================")
     """
     Email Request
     """
     profile_request = requests.get(
         "https://kapi.kakao.com/v2/user/me", headers={"Authorization": f"Bearer {access_token}"})
     profile_json = profile_request.json()
-    print("==========profile_json=========")
-    print(profile_json)
-    print("===================")
     error = profile_json.get("error")
     if error is not None:
         raise JSONDecodeError(error)
     kakao_account = profile_json.get('kakao_account')
-    print("==========kakao_account=========")
-    print(kakao_account)
-    print("===================")
+
     """
     kakao_account에서 이메일 외에
     카카오톡 프로필 이미지, 배경 이미지 url 가져올 수 있음
@@ -389,9 +377,6 @@ def kakao_callback(request):
         # 기존에 가입된 유저의 Provider가 kakao가 아니면 에러 발생, 맞으면 로그인
         # 다른 SNS로 가입된 유저
         social_user = SocialAccount.objects.get(user=user)
-        print("=======================")
-        print(social_user)
-        print("=======================")
         if social_user is None:
             return JsonResponse({'err_msg': 'email exists but not social user'}, status=status.HTTP_400_BAD_REQUEST)
         if social_user.provider != 'kakao':
@@ -400,18 +385,38 @@ def kakao_callback(request):
         data = {'access_token': access_token, 'code': code}
         accept = requests.post(
             f"{BASE_URL}accounts/kakao/login/finish/", data=data)
-        print("==========accept=========")
-        print(accept)
-        print("=======================")
         accept_status = accept.status_code
         if accept_status != 200:
             return JsonResponse({'err_msg': 'failed to signin'}, status=accept_status)
         accept_json = accept.json()
         accept_json.pop('user', None)
-        print("======================로그인-==============")
-        # requests.post("http://localhost:5173", data=JsonResponse(accept_json))
-        return JsonResponse(accept_json)
-        # return HttpResponse(f"accept_json:{accept_json}")
+        
+        if user is not None:
+            # serializer = UserSerializer(user)
+            # jwt 토큰 접근
+            token = TokenObtainPairSerializer.get_token(user)
+            refresh_token = str(token)
+            access_token = str(token.access_token)
+            res = JsonResponse(
+                {
+                    # "user": serializer.data,
+                    "message": "login success",
+                    "token": {
+                        "access": access_token,
+                        "refresh": refresh_token,
+                    },
+                },
+                status=status.HTTP_200_OK,
+            )
+            
+            # jwt 토큰 => 쿠키에 저장
+            res.set_cookie("access", access_token, httponly=True)
+            res.set_cookie("refresh", refresh_token, httponly=True)
+
+            return res
+        
+        # print(accept_json)
+        # return JsonResponse(accept_json)
     except Users.DoesNotExist:
         # 기존에 가입된 유저가 없으면 새로 가입
         data = {'access_token': access_token, 'code': code}
@@ -423,7 +428,34 @@ def kakao_callback(request):
         # user의 pk, email, first name, last name과 Access Token, Refresh token 가져옴
         accept_json = accept.json()
         accept_json.pop('user', None)
-        return JsonResponse(accept_json)
+        
+        user = Users.objects.get(email=email)
+        
+        if user is not None:
+            # serializer = UserSerializer(user)
+            # jwt 토큰 접근
+            token = TokenObtainPairSerializer.get_token(user)
+            refresh_token = str(token)
+            access_token = str(token.access_token)
+            res = JsonResponse(
+                {
+                    # "user": serializer.data,
+                    "message": "register success",
+                    "token": {
+                        "access": access_token,
+                        "refresh": refresh_token,
+                    },
+                },
+                status=status.HTTP_200_OK,
+            )
+            
+            # jwt 토큰 => 쿠키에 저장
+            res.set_cookie("access", access_token, httponly=True)
+            res.set_cookie("refresh", refresh_token, httponly=True)
+
+            return res
+        
+        # return JsonResponse(accept_json)
 
 
 class KakaoLogin(SocialLoginView):
