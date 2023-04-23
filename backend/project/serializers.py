@@ -73,13 +73,13 @@ class ProjectPostSerializer(serializers.ModelSerializer):
 		project = models.Project.objects.create(**validated_data)
 		images_data = self.context['request'].FILES
 
-		for image_data in images_data.getlist('previewImages'):
+		for image_data in images_data.getlist('thumbnails'):
 			# 파일 이름 바꾸는 방법
    			# path_etc = image_data.name.split('.')[-1]
 			# image_data.name = f'{project.id}/abc.{path_etc}'
 			models.Preview_Image.objects.create(project=project, image_url=image_data)
 		hashtag = self.context['request'].data
-		for hashtag in hashtag.getlist('projectHashtag'):
+		for hashtag in hashtag.getlist('hashtags'):
 			get_hashtag = models.Hashtag.objects.filter(title=hashtag)
 			if get_hashtag:
 				get_hashtag = models.Hashtag.objects.get(title=hashtag)

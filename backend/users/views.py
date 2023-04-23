@@ -1,4 +1,3 @@
-from django.shortcuts import render
 from rest_framework.views import APIView
 from .serializers import *
 from rest_framework_simplejwt.serializers import TokenObtainPairSerializer, TokenRefreshSerializer
@@ -23,7 +22,6 @@ from allauth.socialaccount.providers.github import views as github_view
 from allauth.socialaccount.providers.oauth2.client import OAuth2Client
 from allauth.socialaccount.models import SocialAccount
 from .models import Users
-from django.http import HttpResponse 
 
 
 # Create your views here.
@@ -139,7 +137,7 @@ class AuthAPIView(APIView):
 BASE_URL = 'http://localhost:8000/api/v1/'
 GOOGLE_CALLBACK_URI = BASE_URL + 'accounts/google/callback/'
 # KAKAO_CALLBACK_URI = BASE_URL + 'accounts/kakao/callback/'
-KAKAO_CALLBACK_URI = 'http://localhost:5173/login'
+KAKAO_CALLBACK_URI = 'http://localhost:5173'
 GITHUB_CALLBACK_URI = BASE_URL + 'accounts/github/callback/'
 
 state = getattr(settings, 'STATE')

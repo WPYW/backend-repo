@@ -1,5 +1,6 @@
 from django.db import models
 from utils.model_abstracts import Model
+from users.models import Users
 from django_extensions.db.models import (
 	TimeStampedModel, 
 	ActivatorModel,
@@ -19,11 +20,12 @@ class Project(
 		verbose_name_plural = "Projects"
 		ordering = ["-created"]
 
+	user = models.ForeignKey(Users, null=True, blank=True, on_delete=models.CASCADE)
 	github_link = models.CharField(max_length=200, null=False)
 	demo_link = models.CharField(max_length=200, null=True)
 	views = models.IntegerField(default=0, null=False)
 	likes = models.IntegerField(default=0, null=False)
-
+	
 	def __str__(self):
 		return f'{self.id}'
 
